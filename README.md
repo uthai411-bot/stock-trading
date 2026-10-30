@@ -47,7 +47,12 @@ out/                     ผลลัพธ์ (signal.json · report.html · ba
 ## ใช้งาน
 
 ```bash
+# ติดตั้งครั้งแรก — ใช้ virtual env และอัปเกรด pip/setuptools/wheel ก่อน
+# (settrade-v2 พ่วง paho-mqtt<2 กับ stringcase ที่ต้อง build จากซอร์ส · setuptools รุ่นเก่าที่ไม่มี wheel จะ build ไม่ผ่าน)
+python3 -m venv .venv && source .venv/bin/activate
+pip install --upgrade pip setuptools wheel
 pip install -r requirements.txt
+
 python3 -m pytest -q                                   # เทสต์ทั้งหมด
 python3 -m tfexflow synth      --out data/sample       # สร้างข้อมูลจำลอง 3 ปี
 python3 -m tfexflow hypothesis --data data/sample      # ขั้นที่ 1: วัดอำนาจทำนาย

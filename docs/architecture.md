@@ -58,6 +58,6 @@ python3 -m tfexflow report   --data data/real      # → out/report.html
 - **ไฟล์ CSV เป็นตัวกลาง ไม่ใช่ฐานข้อมูล** — ข้อมูลรายวัน 50 หุ้น × 5 ปี ≈ 60,000 แถว pandas อ่านไม่ถึงวินาที
   ย้ายไป Postgres/TimescaleDB เมื่อเริ่มชั้นรายนาที
 - **Open Interest มาจากเว็บ TFEX ไม่ใช่ Settrade** — อ่านโค้ด SDK `settrade-v2` 2.2.1 แล้ว แท่งเทียนไม่มี OI
-- **SDK ของ Settrade เป็น optional** — import ตอนใช้คำสั่ง `fetch` เท่านั้น · ยังไม่อยู่ใน requirements.txt
-  (รอเจ้าของอนุมัติตาม CLAUDE.md ข้อ 6 · SDK พ่วง requests cryptography betterproto paho-mqtt ntplib)
+- **SDK ของ Settrade (`settrade-v2==2.2.1`)** — เจ้าของอนุมัติ 30 ต.ค. 2569 · อยู่ใน requirements.txt แล้ว
+  ยัง import ตอนใช้คำสั่ง `fetch` เท่านั้น เพื่อให้ส่วนวิเคราะห์รันได้แม้เครื่องนั้นไม่มี SDK
 - **วันหยุดตลาดไทยยังไม่อยู่ในระบบ** — มีผลแค่การคาดวันหมดอายุซีรีส์ (ใช้วางแผนดึงข้อมูล) · การ roll ใช้ข้อมูลจริง
