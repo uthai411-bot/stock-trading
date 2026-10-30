@@ -1,7 +1,6 @@
 # TFEX Flow — ระบบวิเคราะห์กระแสเงินเพื่อหาจุดซื้อขาย S50 Futures
 
-> โปรเจกต์นี้ **แยกจาก SAMUD โดยสิ้นเชิง** — อยู่ในโฟลเดอร์นี้ชั่วคราวเพื่อให้เปิดดูได้จากแอป
-> ควรย้ายไป repository ของตัวเองเมื่อเริ่มใช้งานจริง · กติกาใน `CLAUDE.md` ของ SAMUD ไม่ครอบคลุมโฟลเดอร์นี้
+> Repository: `uthai411-bot/stock-trading` · ย้ายออกจาก samud เมื่อ 30 ต.ค. 2569 · กติกาอยู่ใน `CLAUDE.md`
 
 ## สมมุติฐานที่ระบบนี้สร้างมาเพื่อ "พิสูจน์" ไม่ใช่ "เชื่อ"
 
@@ -45,7 +44,7 @@ out/                     ผลลัพธ์ (signal.json · report.html · ba
 ## ใช้งาน
 
 ```bash
-cd tfex-flow
+pip install -r requirements.txt
 python3 -m pytest -q                                   # เทสต์ทั้งหมด
 python3 -m tfexflow synth      --out data/sample       # สร้างข้อมูลจำลอง 3 ปี
 python3 -m tfexflow hypothesis --data data/sample      # ขั้นที่ 1: วัดอำนาจทำนาย
