@@ -1,0 +1,12 @@
+[project]
+name = "tfexflow"
+version = "0.1.0"
+description = "กระแสเงินรายกลุ่ม + วอลุ่ม SET50 → สัญญาณ S50 Futures (วิจัย/ทดสอบย้อนหลัง/แดชบอร์ด)"
+requires-python = ">=3.11"
+dependencies = ["pandas>=2.2", "numpy>=1.26"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
