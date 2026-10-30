@@ -51,7 +51,9 @@ def basis_features(s50: pd.DataFrame, index: pd.DataFrame, p: FeatureParams) -> 
     ★ ใกล้วันหมดอายุ basis จะวิ่งเข้าศูนย์ตามธรรมชาติ — ถ้าไฟล์ s50 roll ไม่ดี ปัจจัยนี้จะเพี้ยน ให้ตั้งน้ำหนัก 0
     """
     out = pd.DataFrame(index=s50.index)
-    out["basis"] = s50["close"] - index["close"]
+    # ★ ไฟล์จาก `tfexflow roll` มีราคาปรับย้อนหลัง — basis ต้องใช้ราคาจริงของซีรีส์ (close_raw)
+    fut = s50["close_raw"] if "close_raw" in s50.columns else s50["close"]
+    out["basis"] = fut - index["close"]
     out["basis_z"] = rolling_z(out["basis"], p.basis_window)
     out["f_basis"] = -squash(out["basis_z"])
     return out

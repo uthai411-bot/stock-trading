@@ -115,6 +115,54 @@ def cmd_report(a):
     print(f"เขียนแดชบอร์ดที่ {p.resolve()}")
 
 
+def cmd_roll(a):
+    from .ingest.roll import build_continuous, read_series_dir, write_s50_daily
+    frames = read_series_dir(a.series_dir)
+    cont = build_continuous(frames)
+    Path(a.out).mkdir(parents=True, exist_ok=True)
+    write_s50_daily(cont, Path(a.out) / "s50_daily.csv")
+    rolls = cont["series"].ne(cont["series"].shift()).sum() - 1
+    print(f"ต่อ {len(frames)} ซีรีส์ → {len(cont)} วัน · roll {rolls} ครั้ง · เขียน {Path(a.out) / 's50_daily.csv'}")
+    print(f"ช่วง {cont.index[0].date()} ถึง {cont.index[-1].date()} · ซีรีส์ล่าสุด {cont['series'].iloc[-1]}")
+
+
+def cmd_fetch(a):
+    from .ingest import series as SR
+    from .ingest.envfile import load_env
+    from .ingest.settrade import fetch_daily, market_from_env
+    load_env(a.env)
+    market = market_from_env()
+    sdir = Path(a.out) / "series"; sdir.mkdir(parents=True, exist_ok=True)
+    codes = SR.series_between(a.start, a.end)
+    got = 0
+    for code in codes:
+        df = fetch_daily(market, code, a.start, a.end)
+        if df.empty:
+            continue
+        df = df.assign(open_interest=float("nan"))
+        df.index = df.index.strftime("%Y-%m-%d"); df.index.name = "date"
+        df.to_csv(sdir / f"{code}.csv"); got += 1
+        print(f"  {code}: {len(df)} วัน")
+    idx = fetch_daily(market, "SET50", a.start, a.end)[["close"]]
+    idx.index = idx.index.strftime("%Y-%m-%d"); idx.index.name = "date"
+    idx.to_csv(Path(a.out) / "set50_index_daily.csv")
+    print(f"ดึง {got} ซีรีส์ + ดัชนี SET50 {len(idx)} วัน · ต่อเป็นเส้นเดียวด้วย: "
+          f"python3 -m tfexflow roll --series-dir {sdir} --out {a.out}")
+
+
+def _pairs(text: str) -> tuple[float, float]:
+    b, s = text.split("/")
+    return float(b.replace(",", "")), float(s.replace(",", ""))
+
+
+def cmd_add_flow(a):
+    from .ingest.flowlog import SET_TYPES, TFEX_TYPES, append
+    types = SET_TYPES if a.market == "set" else TFEX_TYPES
+    values = {t: _pairs(getattr(a, t)) for t in types if getattr(a, t, None)}
+    p = append(a.data, a.market, a.date, values)
+    print(f"บันทึก {a.market.upper()} วันที่ {a.date} ลง {p}")
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(prog="tfexflow", description="กระแสเงินรายกลุ่ม + วอลุ่ม SET50 → สัญญาณ S50")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -129,6 +177,20 @@ def main(argv=None) -> int:
         s.add_argument("--data", required=True); s.add_argument("--out", default="out")
         if name == "backtest":
             s.add_argument("--no-wf", action="store_true", help="ข้าม walk-forward")
+    s = sub.add_parser("roll", help="ต่อไฟล์รายซีรีส์ (S50Z26.csv …) เป็น s50_daily.csv"); s.set_defaults(fn=cmd_roll)
+    s.add_argument("--series-dir", required=True); s.add_argument("--out", required=True)
+
+    s = sub.add_parser("fetch", help="ดึงแท่งเทียนรายวันจาก Settrade Open API (อ่านอย่างเดียว)"); s.set_defaults(fn=cmd_fetch)
+    s.add_argument("--start", required=True); s.add_argument("--end", required=True)
+    s.add_argument("--out", default="data/real"); s.add_argument("--env", default=".env")
+
+    s = sub.add_parser("add-flow", help="กรอกยอดซื้อ/ขายรายกลุ่มของวันเดียว (ซื้อ/ขาย เช่น 30500/33363)")
+    s.set_defaults(fn=cmd_add_flow)
+    s.add_argument("market", choices=["set", "tfex"]); s.add_argument("--date", required=True)
+    s.add_argument("--data", default="data/real")
+    for t in ("foreign", "institution", "proprietary", "retail", "local"):
+        s.add_argument(f"--{t}", help=f"{t}: ซื้อ/ขาย")
+
     a = ap.parse_args(argv)
     a.fn(a)
     return 0

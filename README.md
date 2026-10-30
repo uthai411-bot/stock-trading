@@ -27,7 +27,10 @@ tfexflow/
   backtest/engine.py     ทดสอบย้อนหลังรายวัน · ต้นทุนจริง · ขนาดสถานะตาม ATR · สวิตช์ตัดขาดทุน · walk-forward
   backtest/metrics.py    Sharpe · max drawdown · profit factor · จำนวนรอบ
   report/html.py         แดชบอร์ด HTML ไฟล์เดียว (SVG ในตัว ไม่พึ่งไลบรารีภายนอก)
-  cli.py                 คำสั่ง: synth · hypothesis · backtest · signal · report
+  ingest/settrade.py     ดึงแท่งเทียนรายวันจาก Settrade Open API (อ่านอย่างเดียว)
+  ingest/roll.py         ต่อซีรีส์รายเดือน (S50Z26 …) เป็นเส้นต่อเนื่อง ปรับราคาย้อนหลัง
+  ingest/flowlog.py      กรอกยอดซื้อขายรายกลุ่มรายวันด้วยมือ (ตรวจวันซ้ำ · ผลรวมสุทธิ)
+  cli.py                 คำสั่ง: synth · hypothesis · backtest · signal · report · fetch · roll · add-flow
 tests/                   pytest
 data/                    วางไฟล์ CSV จริงที่นี่ (ดู data/README.md) · data/sample = จำลอง
 out/                     ผลลัพธ์ (signal.json · report.html · backtest.csv)
@@ -52,6 +55,8 @@ python3 -m tfexflow backtest   --data data/sample      # ขั้นที่ 2
 python3 -m tfexflow signal     --data data/sample      # สัญญาณของวันถัดไป → out/signal.json
 python3 -m tfexflow report     --data data/sample      # แดชบอร์ด → out/report.html
 ```
+
+ข้อมูลจริง งานประจำวัน และเส้นทางพัฒนา ดู `docs/architecture.md`
 
 ## แผนขั้นถัดไป (ยังไม่ทำ)
 

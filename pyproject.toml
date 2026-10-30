@@ -7,6 +7,8 @@ dependencies = ["pandas>=2.2", "numpy>=1.26"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+# ★ รอเจ้าของอนุมัติ (CLAUDE.md ข้อ 6) — ใช้เฉพาะคำสั่ง fetch · ไม่ติดตั้งก็ใช้ส่วนอื่นได้ครบ
+settrade = ["settrade-v2==2.2.1"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
